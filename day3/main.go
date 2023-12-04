@@ -117,16 +117,19 @@ func main() {
 		symbols[index] = scanLinesForSymbols(line, index)
 	}
 
+	//getting location of all gears
 	gears := make([][]int, len(fileLines))
 	for index, line := range fileLines {
 		gears[index] = scanLinesForGears(line, index)
 	}
 
+	// Checking all lines to see if they're valid part numbers
 	for i := 1; i < len(fileLines)-1; i++ {
 		checkAdjacentLine(numbers[i], &symbols[i])
 		checkTopLine(numbers[i], &symbols[i-1])
 		checkBottomLine(numbers[i], &symbols[i+1])
 	}
+	// These two check the top and bottom lines. Easiest way of doing it without a do while loop
 	checkTopLine(numbers[len(fileLines)-1], &symbols[len(fileLines)-2])
 	checkBottomLine(numbers[0], &symbols[1])
 
@@ -139,6 +142,7 @@ func main() {
 		}
 	}
 
+	fmt.Println("Positions of all gears: ")
 	for _, value := range gears {
 		fmt.Println(value)
 	}

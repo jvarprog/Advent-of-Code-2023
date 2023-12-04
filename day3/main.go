@@ -146,6 +146,6 @@ func main() {
 	for _, value := range gears {
 		fmt.Println(value)
 	}
-	fmt.Printf("Part 1 Total Sum: %d", totalSum)
+	fmt.Printf("Part 1 Total Sum: %d\n", totalSum)
 
 }

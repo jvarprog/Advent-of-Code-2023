@@ -142,10 +142,18 @@ func main() {
 		}
 	}
 
-	fmt.Println("Positions of all gears: ")
+	totalGearPower := 0
+	for index, a := range gears {
+		if len(a) != 0 {
+			totalGearPower++
+		}
+		fmt.Printf("Gears in line %d; %d\n", index, len(a))
+	}
+
+	/*fmt.Println("Positions of all gears: ")
 	for _, value := range gears {
 		fmt.Println(value)
-	}
+	}*/
 	fmt.Printf("Part 1 Total Sum: %d\n", totalSum)
 
 }

@@ -48,8 +48,47 @@ func scanLinesForSymbols(line string, lineNum int) []int {
 	return symbolsArray
 }
 
+func scanLinesForGears(line string, lineNum int) []int {
+	re := regexp.MustCompile(`[*]`)
+	regexResult := re.FindAllStringIndex(line, -1)
+	gearArrays := make([]int, len(regexResult))
+	for index, _ := range regexResult {
+		gearArrays[index] = regexResult[index][0]
+	}
+	return gearArrays
+}
+
+func checkAdjacentLine(numbers []number, symbols *[]int) {
+	for _, symbol := range *symbols {
+		for index, num := range numbers {
+			if symbol >= num.start-1 && symbol <= num.end+1 {
+				numbers[index].isValid = true
+			}
+		}
+	}
+}
+
+func checkTopLine(numbers []number, symbols *[]int) {
+	for _, symbol := range *symbols {
+		for index, num := range numbers {
+			if symbol >= num.start-1 && symbol <= num.end+1 {
+				numbers[index].isValid = true
+			}
+		}
+	}
+}
+
+func checkBottomLine(numbers []number, symbols *[]int) {
+	for _, symbol := range *symbols {
+		for index, num := range numbers {
+			if symbol >= num.start-1 && symbol <= num.end+1 {
+				numbers[index].isValid = true
+			}
+		}
+	}
+}
+
 func main() {
-	//symbolRE := regexp.MustCompile(`[^0-9.]`)
 	input, err := os.Open("input.txt")
 
 	if err != nil {
@@ -78,8 +117,31 @@ func main() {
 		symbols[index] = scanLinesForSymbols(line, index)
 	}
 
-	for _, value := range symbols {
+	gears := make([][]int, len(fileLines))
+	for index, line := range fileLines {
+		gears[index] = scanLinesForGears(line, index)
+	}
+
+	for i := 1; i < len(fileLines)-1; i++ {
+		checkAdjacentLine(numbers[i], &symbols[i])
+		checkTopLine(numbers[i], &symbols[i-1])
+		checkBottomLine(numbers[i], &symbols[i+1])
+	}
+	checkTopLine(numbers[len(fileLines)-1], &symbols[len(fileLines)-2])
+	checkBottomLine(numbers[0], &symbols[1])
+
+	totalSum := 0
+	for _, a := range numbers {
+		for _, b := range a {
+			if b.isValid {
+				totalSum += b.value
+			}
+		}
+	}
+
+	for _, value := range gears {
 		fmt.Println(value)
 	}
+	fmt.Printf("Part 1 Total Sum: %d", totalSum)
 
 }

@@ -143,11 +143,13 @@ func main() {
 	}
 
 	totalGearPower := 0
-	for index, a := range gears {
-		if len(a) != 0 {
-			totalGearPower++
+	for index, _ := range fileLines {
+		for _, value := range numbers[index] {
+			if value.isValid == true {
+				totalGearPower++
+			}
 		}
-		fmt.Printf("Gears in line %d; %d\n", index, len(a))
+		fmt.Println(totalGearPower)
 	}
 
 	/*fmt.Println("Positions of all gears: ")

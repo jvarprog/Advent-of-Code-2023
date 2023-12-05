@@ -121,11 +121,8 @@ func main() {
 	for index, val := range values {
 		if val[0] >= 1 {
 			for i := index + 1; (i <= index+val[0]) && (i < fileLength); i++ {
-				values[i][0] = 1 * copies[index]
-				copies[i]++
+				copies[i] += 1 * copies[index]
 			}
-		} else {
-			fmt.Println("Skibidi toilet")
 		}
 	}
 

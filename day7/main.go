@@ -1,83 +1,61 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 )
 
-type Game struct {
-	hand     string
-	handType string
-	bid      int
-}
-
-func calculateHandType(hand string) string {
-	m := make(map[string]int)
-	result := "High"
-
-	for _, card := range hand {
-		char := string(card)
-		_, isPresent := m[char]
-		if isPresent {
-			m[char] += 1
-		} else {
-			m[char] = 1
-		}
-	}
-	handValues := []int{}
-	for _, value := range m {
-		handValues = append(handValues, value)
-	}
-	slices.Sort(handValues)
-	slices.Reverse(handValues)
-	length := len(handValues)
-	if length == 1 {
-		result = "Five"
-	} else if length == 2 {
-		if handValues[0] == 4 {
-			result = "Four"
-		} else {
-			result = "Full House"
-		}
-	} else if length == 3 {
-		if handValues[0] == 3 {
-			result = "Three"
-		} else {
-			result = "Two"
-		}
-	} else if length == 4 {
-		result = "One"
-	}
-	return result
+type Hand struct {
+	Cards string
+	Bid   int
 }
 
 func main() {
-	file, err := os.Open("input.txt")
-	if err != err {
-		fmt.Println(err)
-		os.Exit(1)
+	input, _ := os.ReadFile("input.txt")
+
+	hands := []Hand{}
+	for _, s := range strings.Split(strings.TrimSpace(string(input)), "\n") {
+		h := Hand{}
+		fmt.Sscanf(s, "%s %d", &h.Cards, &h.Bid)
+		hands = append(hands, h)
 	}
 
-	fileScanner := bufio.NewScanner(file)
-	fileScanner.Split(bufio.ScanLines)
-
-	//scan lines into arrays
-	var fileLines []string
-	for fileScanner.Scan() {
-		fileLines = append(fileLines, fileScanner.Text())
+	winnings := func(jokers bool) (w int) {
+		slices.SortFunc(hands, func(a, b Hand) int {
+			return cmp(a.Cards, b.Cards, jokers)
+		})
+		for i, h := range hands {
+			w += (i + 1) * h.Bid
+		}
+		return
 	}
 
-	gamesArray := make([]Game, len(fileLines))
-	for index, line := range fileLines {
-		fields := strings.Fields(line)
-		bidAmount, _ := strconv.Atoi(fields[1])
-		handType := calculateHandType(fields[0])
-		game := Game{hand: fields[0], handType: handType, bid: bidAmount}
-		gamesArray[index] = game
-		fmt.Println(game)
+	fmt.Println(winnings(false))
+	fmt.Println(winnings(true))
+}
+
+func cmp(a, b string, jokers bool) int {
+	j, r := "J", "TAJBQCKDAE"
+	if jokers {
+		j, r = "23456789TQKA", "TAJ0QCKDAE"
 	}
+
+	typ := func(cards string) string {
+		k := 0
+		for _, j := range strings.Split(j, "") {
+			n, t := strings.ReplaceAll(cards, "J", j), 0
+			for _, s := range n {
+				t += strings.Count(n, string(s))
+			}
+			k = slices.Max([]int{k, t})
+		}
+		return map[int]string{5: "0", 7: "1", 9: "2", 11: "3", 13: "4", 17: "5", 25: "6"}[k]
+	}
+
+	return strings.Compare(
+		typ(a)+strings.NewReplacer(strings.Split(r, "")...).Replace(a),
+		typ(b)+strings.NewReplacer(strings.Split(r, "")...).Replace(b),
+	)
 }
